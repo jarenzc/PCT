@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Video Interaction</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="video-container">
+        <video id="intro" src="intro.mp4" autoplay muted playsinline loop></video>
+
+        <video id="video" src="video.mp4" style="display: none;" playsinline></video>
+    </div>
+
+    <!-- timer for touch interaction: -->
+        <div id="timerDisplay" class="timer-display">Timer: 0</div>
+    
+
+    <script>
+        let introVideo = document.getElementById('intro');
+        let mainVideo = document.getElementById('video');
+
+        let timerDisplay = document.getElementById('timerDisplay');
+        let timerStart = null; // Variable to store the start time
+        let timerInterval = null; // Interval to update the timer display
+
+        // Function to switch from intro video to main video
+        function switchToMainVideo() {
+        // Pause and hide the intro video
+            introVideo.pause();
+            introVideo.style.display = 'none';
+    
+         // Show and play the main video
+            mainVideo.style.display = 'block';
+            mainVideo.play();
+        // Reset timer and display
+            resetTimer();
+        }
+
+        // Function to switch back from main video to intro video
+        function switchToIntroVideo() {
+            // Pause and hide the main video
+            mainVideo.pause();
+            mainVideo.style.display = 'none';
+            
+            // Show and play the intro video
+            introVideo.style.display = 'block';
+            introVideo.play();
+        }
+
+        // Function to reset the timer and display
+        function resetTimer() {
+            clearInterval(timerInterval);
+            timerStart = null;
+            timerDisplay.textContent = 'Timer: 0';
+        }
+
+        // Function to start the timer and update the display
+        function startTimer() {
+            if (!timerStart) {
+                timerStart = Date.now();
+                timerInterval = setInterval(() => {
+                    let elapsedTime = Date.now() - timerStart;
+                    timerDisplay.textContent = `Timer: ${(elapsedTime / 1000).toFixed(2)}`;
+                    
+                    // If elapsed time reaches 0.1 second, switch to main video
+                    if (elapsedTime >= 500) {
+                        clearInterval(timerInterval);
+                        switchToMainVideo();
+                    }
+                }, 100);
+            }
+        }
+
+        // Event listener for keydown events
+        document.addEventListener('keydown', (event) => {
+            // Check if the pressed key is an arrow key
+            if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) {
+                // Reset the timer and start a new one
+                startTimer();
+            }
+        });
+
+        // Event listener for keyup events
+        document.addEventListener('keyup', () => {
+            // Reset the timer when the key is released
+            resetTimer();
+        });
+
+        // Event listener for when the main video ends
+        mainVideo.addEventListener('ended', switchToIntroVideo);
+    </script>
+</body>
+
+</html>
